@@ -51,6 +51,7 @@ const server = http.createServer(async (req, res) => {
         });
 
         const data = await response.json();
+        console.log("API response:", JSON.stringify(data));
         res.writeHead(200, { "Content-Type": "application/json" });
         res.end(JSON.stringify(data));
       } catch (err) {
