@@ -66,7 +66,6 @@ NZ_INSTITUTIONS:
 - [Institution name] — [Course name]
 - [Institution name] — [Course name]
 - [Institution name] — [Course name]`;
-
 const server = http.createServer(async (req, res) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
