@@ -73,7 +73,7 @@ const server = http.createServer(async (req, res) => {
   res.end("Not found");
 });
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 10000;
 server.listen(PORT, () => {
   console.log(`Future Me server running on port ${PORT}`);
 });
