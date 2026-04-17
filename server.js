@@ -26,7 +26,10 @@ const server = http.createServer(async (req, res) => {
     req.on("data", (chunk) => (body += chunk));
     req.on("end", async () => {
       try {
-        const { messages } = JSON.parse(body);
+        let { messages } = JSON.parse(body);
+if (!messages || messages.length === 0) {
+  messages = [{ role: "user", content: "Hello, please introduce yourself and ask me your first question." }];
+}
         const apiKey = process.env.ANTHROPIC_API_KEY;
 
         if (!apiKey) {
