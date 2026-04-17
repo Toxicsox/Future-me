@@ -22,9 +22,9 @@
       background: #ffffff;
       border-radius: 20px;
       width: 100%;
-      max-width: 560px;
+      max-width: 600px;
       height: 92vh;
-      max-height: 760px;
+      max-height: 800px;
       display: flex;
       flex-direction: column;
       box-shadow: 0 4px 32px rgba(0,0,0,0.07);
@@ -93,6 +93,104 @@
       border: 1px solid #ebebea;
     }
 
+    /* Career cards container */
+    .careers-wrap {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding: 4px 0;
+    }
+
+    .careers-intro {
+      font-size: 14px;
+      font-weight: 300;
+      color: #1a1a1a;
+      line-height: 1.65;
+      padding: 12px 16px;
+      background: #f7f7f5;
+      border-radius: 18px 18px 18px 4px;
+      border: 1px solid #ebebea;
+      margin-bottom: 4px;
+    }
+
+    .career-card {
+      background: #ffffff;
+      border: 1px solid #ebebea;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+
+    .career-card-header {
+      background: #1D9E75;
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .career-title {
+      font-family: 'DM Serif Display', serif;
+      font-size: 17px;
+      color: #ffffff;
+      letter-spacing: -0.3px;
+    }
+
+    .career-emoji {
+      font-size: 20px;
+    }
+
+    .career-card-body {
+      padding: 14px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .career-row {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .career-label {
+      font-size: 10px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #1D9E75;
+    }
+
+    .career-value {
+      font-size: 13px;
+      font-weight: 300;
+      color: #1a1a1a;
+      line-height: 1.5;
+    }
+
+    .career-divider {
+      height: 1px;
+      background: #f0f0ee;
+      margin: 2px 0;
+    }
+
+    .next-step-row {
+      background: #f0faf6;
+      border-radius: 10px;
+      padding: 10px 12px;
+    }
+
+    .next-step-row .career-label {
+      color: #0F6E56;
+    }
+
+    .next-step-row .career-value {
+      color: #0F6E56;
+      font-weight: 400;
+    }
+
+    /* Typing indicator */
     .typing {
       display: flex;
       align-items: center;
@@ -175,6 +273,19 @@
       margin-top: 4px;
     }
     button.restart:hover { color: #888; }
+
+    /* Card entrance animation */
+    @keyframes cardIn {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .career-card {
+      animation: cardIn 0.35s ease forwards;
+    }
+    .career-card:nth-child(2) { animation-delay: 0.08s; }
+    .career-card:nth-child(3) { animation-delay: 0.16s; }
+    .career-card:nth-child(4) { animation-delay: 0.24s; }
+    .career-card:nth-child(5) { animation-delay: 0.32s; }
   </style>
 </head>
 <body>
@@ -206,8 +317,101 @@
 <script>
   let history = [];
 
+  const cardEmojis = ['💡', '🎯', '🚀', '⭐'];
+
+  function parseCareerText(text) {
+    if (!text.includes('CAREERS_START')) return null;
+
+    const introMatch = text.split('CAREERS_START')[0].trim();
+    const careerBlock = text.split('CAREERS_START')[1].split('CAREERS_END')[0];
+
+    const careers = [];
+    for (let i = 1; i <= 4; i++) {
+      const get = (key) => {
+        const regex = new RegExp(`CAREER_${i}_${key}:\\s*(.+)`);
+        const match = careerBlock.match(regex);
+        return match ? match[1].trim() : '';
+      };
+      const title = get('TITLE');
+      if (!title) continue;
+      careers.push({
+        title,
+        why: get('WHY'),
+        salary: get('SALARY'),
+        subjects: get('SUBJECTS'),
+        nextstep: get('NEXTSTEP')
+      });
+    }
+    return { intro: introMatch, careers };
+  }
+
+  function renderCareerCards(parsed) {
+    const wrap = document.createElement('div');
+    wrap.className = 'bubble-wrap agent';
+
+    const container = document.createElement('div');
+    container.className = 'careers-wrap';
+
+    if (parsed.intro) {
+      const intro = document.createElement('div');
+      intro.className = 'careers-intro';
+      intro.textContent = parsed.intro;
+      container.appendChild(intro);
+    }
+
+    parsed.careers.forEach((career, i) => {
+      const card = document.createElement('div');
+      card.className = 'career-card';
+      card.style.animationDelay = `${i * 0.08}s`;
+      card.style.opacity = '0';
+
+      card.innerHTML = `
+        <div class="career-card-header">
+          <div class="career-title">${career.title}</div>
+          <div class="career-emoji">${cardEmojis[i] || '✨'}</div>
+        </div>
+        <div class="career-card-body">
+          <div class="career-row">
+            <div class="career-label">Why it suits you</div>
+            <div class="career-value">${career.why}</div>
+          </div>
+          <div class="career-divider"></div>
+          <div class="career-row">
+            <div class="career-label">Salary range (NZD)</div>
+            <div class="career-value">${career.salary}</div>
+          </div>
+          <div class="career-divider"></div>
+          <div class="career-row">
+            <div class="career-label">Helpful subjects</div>
+            <div class="career-value">${career.subjects}</div>
+          </div>
+          <div class="career-divider"></div>
+          <div class="next-step-row">
+            <div class="career-label">Your next step</div>
+            <div class="career-value">${career.nextstep}</div>
+          </div>
+        </div>
+      `;
+      container.appendChild(card);
+    });
+
+    wrap.appendChild(container);
+    return wrap;
+  }
+
   function addMessage(role, text) {
     const msgs = document.getElementById('messages');
+
+    if (role === 'agent') {
+      const parsed = parseCareerText(text);
+      if (parsed && parsed.careers.length > 0) {
+        const cardsEl = renderCareerCards(parsed);
+        msgs.appendChild(cardsEl);
+        msgs.scrollTop = msgs.scrollHeight;
+        return;
+      }
+    }
+
     const wrap = document.createElement('div');
     wrap.className = `bubble-wrap ${role}`;
     const bubble = document.createElement('div');
