@@ -54,9 +54,11 @@ const server = http.createServer(async (req, res) => {
         res.writeHead(200, { "Content-Type": "application/json" });
         res.end(JSON.stringify(data));
       } catch (err) {
-        res.writeHead(500, { "Content-Type": "application/json" });
-        res.end(JSON.stringify({ error: err.message }));
-      }
+  console.log("Error details:", JSON.stringify(err));
+  console.log("Error message:", err.message);
+  res.writeHead(500, { "Content-Type": "application/json" });
+  res.end(JSON.stringify({ error: err.message }));
+}
     });
     return;
   }
